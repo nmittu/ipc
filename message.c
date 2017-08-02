@@ -23,8 +23,8 @@ void messageSetSubject(Message* msg, char* subject){
     free(msg->subject);
   }
   msg->type = CONN_TYPE_SUB;
-  msg->subject = malloc(strlen(subject));
-  memcpy(msg->subject, subject, strlen(subject));
+  msg->subject = malloc(strlen(subject) + 1);
+  memcpy(msg->subject, subject, strlen(subject) + 1);
 }
 
 void messageDestroy(Message* msg){

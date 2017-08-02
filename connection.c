@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -47,13 +48,14 @@ void* writer(void* args){
   char* data = malloc(len);
 
   memcpy(data, argz->msg, sizeof(Message));
-  memcpy((data + argz->msg->len), argz->msg->data, argz->msg->len);
+  memcpy((data + sizeof(Message)), argz->msg->data, argz->msg->len);
 
   write(fd, data, len);
   close(fd);
 
   free(data);
   free(argz->path);
+  free(argz->msg->data);
   messageDestroy(argz->msg);
   free(argz);
 }
@@ -80,14 +82,13 @@ void* dispatcher(void* args){
   struct dispatcherArgs* argz = args;
 
   pthread_mutex_lock(argz->mutex);
+  int fd = open(argz->path, O_RDONLY);
   while (*(argz->cont)){
-    int fd;
     pthread_mutex_unlock(argz->mutex);
 
     char* data = malloc(MAX_MSG_SIZE);
-    fd = open(argz->path, O_RDONLY);
+
     read(fd, data, MAX_MSG_SIZE);
-    close(fd);
 
     Message* msg = (Message*) data;
     data += sizeof(Message);
@@ -104,11 +105,15 @@ void* dispatcher(void* args){
       case CONN_TYPE_PID:
         if (msg->pid == getpid()){
           dispatch(argz->cb, msg);
+        } else {
+          messageDestroy(msg);
         }
     }
 
     pthread_mutex_lock(argz->mutex);
   }
+
+  close(fd);
 }
 
 int findFreeCBSlot(){
@@ -135,11 +140,11 @@ int findInCBSlot(Connection* conn){
 
 Connection* connectionCreate(char* name, int type){
   Connection* ret = malloc(sizeof(Connection));
-  ret->name = malloc(strlen(name));
-  memcpy(ret->name, name, strlen(name));
+  ret->name = malloc(strlen(name)+1);
+  memcpy(ret->name, name, strlen(name)+1);
   ret->type = type;
 
-  char* path = malloc(strlen(name) + 6);
+  char* path = malloc(strlen(name) + 1 + 6);
   memcpy(path, "/tmp/", 6);
   strcat(path, name);
   mkfifo(path, 0666);
@@ -150,8 +155,8 @@ Connection* connectionCreate(char* name, int type){
 
 Connection* connectionConnect(char* name, int type){
   Connection* ret = malloc(sizeof(Connection));
-  ret->name = malloc(strlen(name));
-  memcpy(ret->name, name, strlen(name));
+  ret->name = malloc(strlen(name) + 1);
+  memcpy(ret->name, name, strlen(name) + 1);
   ret->type = type;
 
   return ret;
@@ -169,7 +174,7 @@ void connectionStartAutoDispatch(Connection* conn){
   *(cbs[i]->args->cont) = 1;
   pthread_mutex_unlock(cbs[i]->args->mutex);
 
-  cbs[i]->args->path = malloc(strlen(conn->name) + 6);
+  cbs[i]->args->path = malloc(strlen(conn->name) + 1 + 6);
   memcpy(cbs[i]->args->path, "/tmp/", 6);
   strcat(cbs[i]->args->path, conn->name);
 
@@ -215,13 +220,17 @@ void connectionRemoveCallback(Connection* conn){
 }
 
 void connectionSend(Connection* conn, Message* msg){
-  char* path = malloc(strlen(conn->name) + 6);
+  char* path = malloc(strlen(conn->name) + 1 + 6);
   memcpy(path, "/tmp/", 6);
   strcat(path, conn->name);
 
   struct writerArgs* args = malloc(sizeof(struct writerArgs));
   args->msg = malloc(sizeof(Message));
   memcpy(args->msg, msg, sizeof(Message));
+
+  args->msg->data = malloc(msg->len);
+  memcpy(args->msg->data, msg->data, msg->len);
+
   args->path = path;
 
   pthread_t tid;
@@ -229,6 +238,11 @@ void connectionSend(Connection* conn, Message* msg){
 }
 
 void connectionDestroy(Connection* conn){
+  char* path = malloc(strlen(conn->name) + 1 + 6);
+  memcpy(path, "/tmp/", 6);
+  strcat(path, conn->name);
+  unlink(path);
+
   free(conn->name);
   free(conn);
 }
