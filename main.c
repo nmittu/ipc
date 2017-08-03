@@ -12,34 +12,39 @@ void recive(Message* msg){
 }
 
 void parent(Connection* conn, pid_t pid){
-  connectionSetCallback(conn, recive);
-  printf("recieving\n");
-  connectionStartAutoDispatch(conn);
-
   while (!recived) {
     usleep(100);
   }
+  connectionStopAutoDispatch(conn);
+  connectionDestroy(conn);
 }
 
-void child(){
-  Connection* conn = connectionConnect("ipcdemo", CONN_TYPE_PID);
+void child(Connection* conn){
+  connectionStopAutoDispatch(conn);
   char* str = "This string was sent over IPC using named pipes!";
   Message* msg = messageCreate(str, strlen(str)+1);
   messageSetPID(msg, getppid());
-  usleep(500000);
-  printf("sending\n");
   connectionSend(conn, msg);
   messageDestroy(msg);
+
+  int i;
+  for (i = 0; i < 50; i++) {
+    usleep(100);
+  }
+  connectionDestroy(conn);
 }
 
 int main(int argc, char const *argv[]) {
+  Connection* conn = connectionCreate("ipcdemo", CONN_TYPE_PID);
+
+  connectionSetCallback(conn, recive);
+  connectionStartAutoDispatch(conn);
 
   pid_t pid = fork();
 
   if (pid == 0){
-    child();
+    child(conn);
   }else{
-    Connection* conn = connectionCreate("ipcdemo", CONN_TYPE_PID);
     parent(conn, pid);
 
     connectionDestroy(conn);

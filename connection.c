@@ -13,7 +13,6 @@
 struct ConnCallbackElement {
   Connection* conn;
   ConnectionCallback cb;
-  pthread_mutex_t mutex;
   pthread_t tid;
   struct dispatcherArgs* args;
 };
@@ -23,7 +22,6 @@ struct dispatcherArgs{
   int type;
   char* path;
   int* cont;
-  pthread_mutex_t* mutex;
 };
 
 struct cbCallerArgs{
@@ -43,6 +41,7 @@ void* writer(void* args){
   struct writerArgs* argz = args;
 
   int fd = open(argz->path, O_WRONLY);
+
 
   size_t len = sizeof(Message) + argz->msg->len;
   char* data = malloc(len);
@@ -65,7 +64,7 @@ void* cbCaller(void* args){
 
   (argz->cb)(argz->msg);
 
-  messageDestroy(argz->msg);
+  free(argz->msg);
   free(argz);
 }
 
@@ -81,10 +80,10 @@ void dispatch(ConnectionCallback cb, Message* msg){
 void* dispatcher(void* args){
   struct dispatcherArgs* argz = args;
 
-  pthread_mutex_lock(argz->mutex);
+
   int fd = open(argz->path, O_RDONLY);
+
   while (*(argz->cont)){
-    pthread_mutex_unlock(argz->mutex);
 
     char* data = malloc(MAX_MSG_SIZE);
 
@@ -106,11 +105,13 @@ void* dispatcher(void* args){
         if (msg->pid == getpid()){
           dispatch(argz->cb, msg);
         } else {
-          messageDestroy(msg);
+          free(msg);
         }
+        break;
+      default:
+        free(msg);
     }
 
-    pthread_mutex_lock(argz->mutex);
   }
 
   close(fd);
@@ -147,7 +148,7 @@ Connection* connectionCreate(char* name, int type){
   char* path = malloc(strlen(name) + 1 + 6);
   memcpy(path, "/tmp/", 6);
   strcat(path, name);
-  mkfifo(path, 0666);
+  mkfifo(path, 0777);
   free(path);
 
   return ret;
@@ -167,12 +168,9 @@ void connectionStartAutoDispatch(Connection* conn){
 
   cbs[i]->args = malloc(sizeof(struct dispatcherArgs));
 
-  cbs[i]->args->mutex = malloc(sizeof(pthread_mutex_t));
 
-  pthread_mutex_lock(cbs[i]->args->mutex);
   cbs[i]->args->cont = malloc(sizeof(int));
   *(cbs[i]->args->cont) = 1;
-  pthread_mutex_unlock(cbs[i]->args->mutex);
 
   cbs[i]->args->path = malloc(strlen(conn->name) + 1 + 6);
   memcpy(cbs[i]->args->path, "/tmp/", 6);
@@ -186,13 +184,10 @@ void connectionStartAutoDispatch(Connection* conn){
 void connectionStopAutoDispatch(Connection* conn){
   int i = findInCBSlot(conn);
 
-  pthread_mutex_lock(cbs[i]->args->mutex);
   *(cbs[i]->args->cont) = 0;
-  pthread_mutex_unlock(cbs[i]->args->mutex);
 
   pthread_join(cbs[i]->tid, NULL);
 
-  free(cbs[i]->args->mutex);
   free(cbs[i]->args->cont);
   free(cbs[i]->args->path);
   free(cbs[i]->args);
@@ -238,10 +233,11 @@ void connectionSend(Connection* conn, Message* msg){
 }
 
 void connectionDestroy(Connection* conn){
-  char* path = malloc(strlen(conn->name) + 1 + 6);
-  memcpy(path, "/tmp/", 6);
-  strcat(path, conn->name);
-  unlink(path);
+  //char* path = malloc(strlen(conn->name) + 1 + 6);
+  //memcpy(path, "/tmp/", 6);
+  //strcat(path, conn->name);
+  //unlink(path);
+  //free(path);
 
   free(conn->name);
   free(conn);
