@@ -1,0 +1,181 @@
+==4780== Memcheck, a memory error detector
+==4780== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==4780== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==4780== Command: ./a.out --leak-check=full
+==4780== 
+==4781== Thread 3:
+==4781== Syscall param write(buf) points to uninitialised byte(s)
+==4781==    at 0x4E4A4BD: ??? (syscall-template.S:84)
+==4781==    by 0x400ED4: writer (connection.c:52)
+==4781==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4781==  Address 0x5421774 is 4 bytes inside a block of size 60 alloc'd
+==4781==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4781==    by 0x400E77: writer (connection.c:47)
+==4781==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4781== 
+==4781== 
+==4781== HEAP SUMMARY:
+==4781==     in use at exit: 816 bytes in 3 blocks
+==4781==   total heap usage: 25 allocs, 22 frees, 1,434 bytes allocated
+==4781== 
+==4780== Thread 2:
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x401067: dispatcher (connection.c:96)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x40106C: dispatcher (connection.c:96)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x401071: dispatcher (connection.c:96)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4781== LEAK SUMMARY:
+==4781==    definitely lost: 0 bytes in 0 blocks
+==4781==    indirectly lost: 0 bytes in 0 blocks
+==4781==      possibly lost: 816 bytes in 3 blocks
+==4781==    still reachable: 0 bytes in 0 blocks
+==4781==         suppressed: 0 bytes in 0 blocks
+==4781== Rerun with --leak-check=full to see details of leaked memory
+==4781== 
+==4781== For counts of detected and suppressed errors, rerun with: -v
+==4781== Use --track-origins=yes to see where uninitialised values come from
+==4781== ERROR SUMMARY: 3 errors from 1 contexts (suppressed: 0 from 0)
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x4010B1: dispatcher (connection.c:105)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Warning: invalid file descriptor -1 in syscall read()
+==4780== Thread 3:
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x50A5CC0: vfprintf (vfprintf.c:1632)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x50A4B83: vfprintf (vfprintf.c:1631)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Use of uninitialised value of size 8
+==4780==    at 0x50A176B: _itoa_word (_itoa.c:179)
+==4780==    by 0x50A512C: vfprintf (vfprintf.c:1631)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x50A1775: _itoa_word (_itoa.c:179)
+==4780==    by 0x50A512C: vfprintf (vfprintf.c:1631)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x50A51AF: vfprintf (vfprintf.c:1631)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x50A4C59: vfprintf (vfprintf.c:1631)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x50A541A: vfprintf (vfprintf.c:1631)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x50A4CAB: vfprintf (vfprintf.c:1631)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Conditional jump or move depends on uninitialised value(s)
+==4780==    at 0x50A4CE2: vfprintf (vfprintf.c:1631)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+==4780== Warning: invalid file descriptor -1 in syscall close()
+==4780== Thread 1:
+==4780== Syscall param write(buf) points to uninitialised byte(s)
+==4780==    at 0x514E2AD: ??? (syscall-template.S:84)
+==4780==    by 0x50CFBFE: _IO_file_write@@GLIBC_2.2.5 (fileops.c:1263)
+==4780==    by 0x50D1408: new_do_write (fileops.c:518)
+==4780==    by 0x50D1408: _IO_do_write@@GLIBC_2.2.5 (fileops.c:494)
+==4780==    by 0x50D3195: _IO_flush_all_lockp (genops.c:786)
+==4780==    by 0x50D3329: _IO_cleanup (genops.c:951)
+==4780==    by 0x5090F9A: __run_exit_handlers (exit.c:95)
+==4780==    by 0x5091044: exit (exit.c:104)
+==4780==    by 0x5077836: (below main) (libc-start.c:325)
+==4780==  Address 0x552165f is 159 bytes inside a block of size 4,096 alloc'd
+==4780==    at 0x4C2DB8F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4780==    by 0x50C41D4: _IO_file_doallocate (filedoalloc.c:127)
+==4780==    by 0x50D2593: _IO_doallocbuf (genops.c:398)
+==4780==    by 0x50D18F7: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:820)
+==4780==    by 0x50D028C: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1331)
+==4780==    by 0x50A4240: vfprintf (vfprintf.c:1320)
+==4780==    by 0x50AC898: printf (printf.c:33)
+==4780==    by 0x400BC2: recive (main.c:9)
+==4780==    by 0x400F53: cbCaller (connection.c:65)
+==4780==    by 0x4E416B9: start_thread (pthread_create.c:333)
+==4780== 
+Recived data: This is the second message!
+To PID: 4780
+Recived data: This string was sent over IPC using named pipes!
+To PID: 4780
+Not Listening
+Recived data: This is the second message!
+To PID: 4780
+==4780== 
+==4780== HEAP SUMMARY:
+==4780==     in use at exit: 848 bytes in 4 blocks
+==4780==   total heap usage: 42 allocs, 38 frees, 24,122,664 bytes allocated
+==4780== 
+==4780== LEAK SUMMARY:
+==4780==    definitely lost: 0 bytes in 0 blocks
+==4780==    indirectly lost: 0 bytes in 0 blocks
+==4780==      possibly lost: 816 bytes in 3 blocks
+==4780==    still reachable: 32 bytes in 1 blocks
+==4780==         suppressed: 0 bytes in 0 blocks
+==4780== Rerun with --leak-check=full to see details of leaked memory
+==4780== 
+==4780== For counts of detected and suppressed errors, rerun with: -v
+==4780== Use --track-origins=yes to see where uninitialised values come from
+==4780== ERROR SUMMARY: 105 errors from 14 contexts (suppressed: 0 from 0)

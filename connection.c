@@ -64,6 +64,7 @@ void* cbCaller(void* args){
 
   (argz->cb)(argz->msg);
 
+  free(argz->msg->data);
   free(argz->msg);
   free(argz);
 }
@@ -81,16 +82,17 @@ void* dispatcher(void* args){
   struct dispatcherArgs* argz = args;
 
 
-  int fd = open(argz->path, O_RDONLY);
+  int fd = open(argz->path, O_RDONLY | O_NONBLOCK);
 
   while (*(argz->cont)){
 
-    char* data = malloc(MAX_MSG_SIZE);
+    Message* msg = malloc(sizeof(Message));
+    read(fd, msg, sizeof(Message));
 
-    read(fd, data, MAX_MSG_SIZE);
+    char* data = malloc(msg->len);
+    read(fd, data, msg->len);
 
-    Message* msg = (Message*) data;
-    data += sizeof(Message);
+
     msg->data = data;
 
     switch (msg->type) {
@@ -106,10 +108,14 @@ void* dispatcher(void* args){
           dispatch(argz->cb, msg);
         } else {
           free(msg);
+          free(data);
         }
         break;
       default:
         free(msg);
+        free(data);
+
+      usleep(100);
     }
 
   }
@@ -233,11 +239,11 @@ void connectionSend(Connection* conn, Message* msg){
 }
 
 void connectionDestroy(Connection* conn){
-  //char* path = malloc(strlen(conn->name) + 1 + 6);
-  //memcpy(path, "/tmp/", 6);
-  //strcat(path, conn->name);
-  //unlink(path);
-  //free(path);
+  char* path = malloc(strlen(conn->name) + 1 + 6);
+  memcpy(path, "/tmp/", 6);
+  strcat(path, conn->name);
+  unlink(path);
+  free(path);
 
   free(conn->name);
   free(conn);
