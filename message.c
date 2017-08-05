@@ -25,6 +25,8 @@ void messageSetSubject(Message* msg, char* subject){
   msg->type = CONN_TYPE_SUB;
   msg->subject = malloc(strlen(subject) + 1);
   memcpy(msg->subject, subject, strlen(subject) + 1);
+
+  printf("%s : %s\n", msg->subject, msg->data);
 }
 
 void messageDestroy(Message* msg){

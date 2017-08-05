@@ -25,6 +25,17 @@ void parent(Connection* conn, pid_t pid){
     usleep(100);
   }
   connectionStopAutoDispatch(conn);
+
+  connectionStartAutoDispatch(conn);
+  connectionSubscribe(conn, "DEMO-SUBJECT");
+  while (recived < 4) {
+    usleep(100);
+  }
+
+  connectionRemoveSubscription(conn, "DEMO-SUBJECT");
+  printf("Next message wont be recieved in 5 seconds\n");
+  sleep(5);
+  connectionStopAutoDispatch(conn);
 }
 
 void child(Connection* conn){
@@ -53,6 +64,37 @@ void child(Connection* conn){
   messageSetPID(msg, getppid());
   connectionSend(conn, msg);
   messageDestroy(msg);
+
+  //Wait for dispatcher to actually stop
+  for (i = 0; i < 50; i++) {
+    usleep(100);
+  }
+
+  str = "Subject Message 1";
+  msg = messageCreate(str, strlen(str)+1);
+  messageSetSubject(msg, "DEMO-SUBJECT");
+  connectionSend(conn, msg);
+  //Wait for message to send
+  for (i = 0; i < 50; i++) {
+    usleep(100);
+  }
+  messageDestroy(msg);
+
+  //Wait for unsubscription
+  for (i = 0; i < 50; i++) {
+    usleep(100);
+  }
+
+  str = "Subject Message 2";
+  msg = messageCreate(str, strlen(str)+1);
+  messageSetSubject(msg, "DEMO-SUBJECT");
+  connectionSend(conn, msg);
+  //Wait for message to send
+  for (i = 0; i < 50; i++) {
+    usleep(100);
+  }
+  messageDestroy(msg);
+
 
   for (i = 0; i < 50; i++) {
     usleep(100);

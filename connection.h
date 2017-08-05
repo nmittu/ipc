@@ -12,6 +12,8 @@
 typedef struct {
   char* name;
   int type;
+  char** subscriptions;
+  int numSubs;
 } Connection;
 
 typedef void (*ConnectionCallback)(Message* msg);
@@ -24,6 +26,8 @@ void connectionSetCallback(Connection* conn, ConnectionCallback cb);
 ConnectionCallback connectionGetCallback(Connection* conn);
 void connectionRemoveCallback(Connection* conn);
 void connectionSend(Connection* conn, Message* msg);
+void connectionSubscribe(Connection* conn, char* subject);
+void connectionRemoveSubscription(Connection* conn, char* subject);
 void connectionDestroy(Connection* conn);
 
 #endif
