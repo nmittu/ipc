@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifndef _WIN32
 #include <unistd.h>
+#endif
+
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -9,19 +13,50 @@
 
 #define MAX_CB 50
 #define SUBS_LEN 10
+#ifdef _WIN32
+     #define getpid GetCurrentProcessId
+	#define TID HANDLE
+	#define THREAD_RET_TYPE DWORD WINAPI
+	#define PIPE_PREFIX "\\\\.\\pipe\\"
+#else
+	#define TID pthread_t
+	#define THREAD_RET_TYPE void*
+	#define PIPE_PREFIX "/tmp/"
+#endif
+#define PIPE_PREFIX_LEN strlen(PIPE_PREFIX) + 1
+
+#ifdef _WIN32
+void usleep(__int64 usec) 
+{ 
+    HANDLE timer; 
+    LARGE_INTEGER ft; 
+
+    ft.QuadPart = -(10*usec); // Convert to 100 nanosecond interval, negative value indicates relative time
+
+    timer = CreateWaitableTimer(NULL, TRUE, NULL); 
+    SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0); 
+    WaitForSingleObject(timer, INFINITE); 
+    CloseHandle(timer); 
+}
+#endif
+
 
 //TODO: Implement hashmap
 struct ConnCallbackElement {
   Connection* conn;
   ConnectionCallback cb;
-  pthread_t tid;
+  TID tid;
   struct dispatcherArgs* args;
 };
 
 struct dispatcherArgs{
   ConnectionCallback cb;
   int type;
-  char* path;
+  #ifdef _WIN32
+    HANDLE hPipe;
+  #else
+    char* path;
+  #endif
   int* cont;
   char** subs;
   int* numSubs;
@@ -60,10 +95,20 @@ int findEqual(char** strs, char* other, int len){
   return -1;
 }
 
-void* writer(void* args){
+THREAD_RET_TYPE writer(void* args){
   struct writerArgs* argz = args;
-
-  int fd = open(argz->path, O_WRONLY);
+  
+  #ifdef _WIN32
+    HANDLE hPipe = CreateFile(TEXT(argz->path),
+    						GENERIC_READ | GENERIC_WRITE,
+    						0,
+    						NULL,
+    						OPEN_EXISTING,
+    						0,
+    						NULL);
+  #else
+    int fd = open(argz->path, O_WRONLY);
+  #endif
 
 
   size_t len = sizeof(Message) + argz->msg->len;
@@ -79,8 +124,13 @@ void* writer(void* args){
     len += sizeof(size_t) + strlen(argz->msg->subject) + 1;
   }
 
-  write(fd, data, len);
-  close(fd);
+  #ifdef _WIN32
+    WriteFile(hPipe, data, len, NULL, NULL);
+    CloseHandle(hPipe);
+  #else
+    write(fd, data, len);
+    close(fd);
+   #endif
 
   free(data);
   free(argz->path);
@@ -89,7 +139,7 @@ void* writer(void* args){
   free(argz);
 }
 
-void* cbCaller(void* args){
+THREAD_RET_TYPE cbCaller(void* args){
   struct cbCallerArgs* argz = args;
 
   (argz->cb)(argz->msg);
@@ -107,31 +157,53 @@ void dispatch(ConnectionCallback cb, Message* msg){
   cbargs->cb = cb;
   cbargs->msg = msg;
 
-  pthread_t tid;
-  pthread_create(&tid, NULL, cbCaller, cbargs);
+  #ifdef _WIN32
+    CreateThread(NULL, 0, cbCaller, cbargs, 0, NULL);
+  #else
+    pthread_t tid;
+    pthread_create(&tid, NULL, cbCaller, cbargs);
+  #endif
 }
 
-void* dispatcher(void* args){
+THREAD_RET_TYPE dispatcher(void* args){
   struct dispatcherArgs* argz = args;
-
-
-  int fd = open(argz->path, O_RDONLY | O_NONBLOCK);
+	
+  #ifdef _WIN32
+    ConnectNamedPipe(argz->hPipe, NULL);
+  #else
+    int fd = open(argz->path, O_RDONLY | O_NONBLOCK);
+  #endif
 
   while (*(argz->cont)){
 
     Message* msg = malloc(sizeof(Message));
-    read(fd, msg, sizeof(Message));
+    #ifdef _WIN32
+      ReadFile(argz->hPipe, msg, sizeof(Message), NULL, NULL);
+    #else
+      read(fd, msg, sizeof(Message));
+    #endif
 
     char* data = malloc(msg->len);
-    read(fd, data, msg->len);
+    #ifdef _WIN32
+      ReadFile(argz->hPipe, data, msg->len, NULL, NULL);
+    #else
+      read(fd, data, msg->len);
+    #endif
     msg->data = data;
 
     if(msg->type == CONN_TYPE_SUB){
       size_t* sub_len = malloc(sizeof(size_t));
-      read(fd, sub_len, sizeof(size_t));
-
+      #ifdef _WIN32
+        ReadFile(argz->hPipe, sub_len, sizeof(size_t), NULL, NULL);
+      #else
+        read(fd, sub_len, sizeof(size_t));
+      #endif
       char* subject = malloc(*sub_len);
-      read(fd, subject, *sub_len);
+      #ifdef _WIN32
+        ReadFile(argz->hPipe, subject, *sub_len, NULL, NULL);
+      #else
+        read(fd, subject, *sub_len);
+      #endif
       msg->subject = subject;
     }
 
@@ -164,8 +236,11 @@ void* dispatcher(void* args){
     }
 
   }
-
-  close(fd);
+  #ifdef _WIN32
+    DisconnectNamedPipe(argz->hPipe);
+  #else
+    close(fd);
+  #endif
 }
 
 int findFreeCBSlot(){
@@ -196,10 +271,21 @@ Connection* connectionCreate(char* name, int type){
   memcpy(ret->name, name, strlen(name)+1);
   ret->type = type;
 
-  char* path = malloc(strlen(name) + 1 + 6);
-  memcpy(path, "/tmp/", 6);
+  char* path = malloc(strlen(name) + 1 + PIPE_PREFIX_LEN);
+  memcpy(path, PIPE_PREFIX, PIPE_PREFIX_LEN);
   strcat(path, name);
-  mkfifo(path, 0777);
+  #ifdef _WIN32
+	ret->hPipe = CreateNamedPipe(TEXT(path),
+						    PIPE_ACCESS_DUPLEX | PIPE_TYPE_BYTE | PIPE_READMODE_BYTE,
+						    PIPE_NOWAIT,
+						    1,
+						    1024 * 16,
+                            	    1024 * 16,
+                            	    NMPWAIT_USE_DEFAULT_WAIT,
+                            	    NULL);
+  #else
+  	mkfifo(path, 0777);
+  #endif
   free(path);
 
   ret->subscriptions = malloc(sizeof(char*) * SUBS_LEN);
@@ -218,6 +304,22 @@ Connection* connectionConnect(char* name, int type){
   memcpy(ret->name, name, strlen(name) + 1);
   ret->type = type;
 
+  #ifdef _WIN32
+  	char* path = malloc(strlen(name) + 1 + PIPE_PREFIX_LEN);
+	memcpy(path, PIPE_PREFIX, PIPE_PREFIX_LEN);
+	strcat(path, name);
+
+  	ret->hPipe = CreateFile(TEXT(path),
+  					    GENERIC_READ | GENERIC_WRITE,
+  					    0,
+  					    NULL,
+  					    OPEN_EXISTING,
+  					    0,
+  					    NULL);
+
+  	free(path);
+  #endif
+
   return ret;
 }
 
@@ -230,27 +332,40 @@ void connectionStartAutoDispatch(Connection* conn){
   cbs[i]->args->cont = malloc(sizeof(int));
   *(cbs[i]->args->cont) = 1;
 
-  cbs[i]->args->path = malloc(strlen(conn->name) + 1 + 6);
-  memcpy(cbs[i]->args->path, "/tmp/", 6);
-  strcat(cbs[i]->args->path, conn->name);
+  #ifdef _WIN32
+    cbs[i]->args->hPipe = conn->hPipe;
+  #else
+    cbs[i]->args->path = malloc(strlen(conn->name) + 1 + PIPE_PREFIX_LEN);
+    memcpy(cbs[i]->args->path, PIPE_PREFIX, PIPE_PREFIX_LEN);
+    strcat(cbs[i]->args->path, conn->name);
+  #endif
 
   cbs[i]->args->cb = cbs[i]->cb;
 
   cbs[i]->args->subs = conn->subscriptions;
   cbs[i]->args->numSubs = &(conn->numSubs);
 
-  pthread_create(&(cbs[i]->tid), NULL, dispatcher, cbs[i]->args);
+  #ifdef _WIN32
+    cbs[i]->tid = CreateThread(NULL, 0, dispatcher, cbs[i]->args, 0, NULL);
+  #else
+    pthread_create(&(cbs[i]->tid), NULL, dispatcher, cbs[i]->args);
+  #endif
 }
 
 void connectionStopAutoDispatch(Connection* conn){
   int i = findInCBSlot(conn);
 
   *(cbs[i]->args->cont) = 0;
-
-  pthread_join(cbs[i]->tid, NULL);
+  #ifdef _WIN32
+    WaitForSingleObject(cbs[i]->tid, INFINITE);
+  #else
+    pthread_join(cbs[i]->tid, NULL);
+  #endif
 
   free(cbs[i]->args->cont);
-  free(cbs[i]->args->path);
+  #ifndef _WIN32
+    free(cbs[i]->args->path);
+  #endif
   free(cbs[i]->args);
 }
 
@@ -276,8 +391,8 @@ void connectionRemoveCallback(Connection* conn){
 }
 
 void connectionSend(Connection* conn, Message* msg){
-  char* path = malloc(strlen(conn->name) + 1 + 6);
-  memcpy(path, "/tmp/", 6);
+  char* path = malloc(strlen(conn->name) + 1 + PIPE_PREFIX_LEN);
+  memcpy(path, PIPE_PREFIX, PIPE_PREFIX_LEN);
   strcat(path, conn->name);
 
   struct writerArgs* args = malloc(sizeof(struct writerArgs));
@@ -289,8 +404,12 @@ void connectionSend(Connection* conn, Message* msg){
 
   args->path = path;
 
-  pthread_t tid;
-  pthread_create(&tid, NULL, writer, args);
+  #ifdef _WIN32
+    CreateThread(NULL, 0, writer, args, 0, NULL);
+  #else
+    pthread_t tid;
+    pthread_create(&tid, NULL, writer, args);
+  #endif
 }
 
 void connectionSubscribe(Connection* conn, char* subject){
@@ -330,10 +449,15 @@ void connectionDestroy(Connection* conn){
   //}
   //free(conn->subscriptions);
 
-  char* path = malloc(strlen(conn->name) + 1 + 6);
-  memcpy(path, "/tmp/", 6);
+  char* path = malloc(strlen(conn->name) + 1 + PIPE_PREFIX_LEN);
+  memcpy(path, PIPE_PREFIX, PIPE_PREFIX_LEN);
   strcat(path, conn->name);
-  unlink(path);
+  #ifdef _WIN32
+	DisconnectNamedPipe(conn->hPipe);
+	CloseHandle(conn->hPipe);
+  #else
+  	unlink(path);
+  #endif
   free(path);
 
   free(conn->name);

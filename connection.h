@@ -1,6 +1,10 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#ifdef _WIN32
+  #include <windows.h>
+#endif
+
 #include "ipc.h"
 
 #define CONN_TYPE_ALL 1
@@ -14,6 +18,9 @@ typedef struct {
   int type;
   char** subscriptions;
   int numSubs;
+  #ifdef _WIN32
+	HANDLE hPipe;
+  #endif
 } Connection;
 
 typedef void (*ConnectionCallback)(Message* msg);

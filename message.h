@@ -1,13 +1,20 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include <sys/types.h>
+
+#ifdef _WIN32
+  #include <windows.h>
+  #define PID DWORD
+#else
+  #include <sys/types.h>
+  #define PID pid_t
+#endif
 
 
 typedef struct {
   int type;
   union {
-    pid_t pid;
+    PID pid;
     char* subject;
   };
 
@@ -18,7 +25,7 @@ typedef struct {
 #include "ipc.h"
 
 Message* messageCreate(char* data, size_t len);
-void messageSetPID(Message* msg, pid_t pid);
+void messageSetPID(Message* msg, PID pid);
 void messageSetSubject(Message* msg, char* subject);
 void messageDestroy(Message* msg);
 

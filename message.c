@@ -10,7 +10,7 @@ Message* messageCreate(char* data, size_t len){
   ret->type = CONN_TYPE_ALL;
 }
 
-void messageSetPID(Message* msg, pid_t pid){
+void messageSetPID(Message* msg, PID pid){
   if(msg->type == CONN_TYPE_SUB){
     free(msg->subject);
   }
@@ -26,7 +26,6 @@ void messageSetSubject(Message* msg, char* subject){
   msg->subject = malloc(strlen(subject) + 1);
   memcpy(msg->subject, subject, strlen(subject) + 1);
 
-  printf("%s : %s\n", msg->subject, msg->data);
 }
 
 void messageDestroy(Message* msg){
