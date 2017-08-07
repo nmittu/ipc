@@ -11,7 +11,7 @@ char* names[50];
 int findName(char* name){
   int i;
   for (i = 0; i < 50; i++) {
-    if (strcmp(names[i], name) == 0){
+    if (names[i] && strcmp(names[i], name) == 0){
       return i;
     }
   }
