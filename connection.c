@@ -466,15 +466,13 @@ void connectionRemoveSubscription(Connection* conn, char* subject){
 }
 
 void connectionDestroy(Connection* conn){
-  //int i;
-  //printf("%p\n", conn->subscriptions);
-  //for(i = 0; i<conn->numSubs; i++){
-  //  printf("%p\n", conn->subscriptions[i]);
-  //  if (conn->subscriptions[i] != NULL){
-      //free(conn->subscriptions[i]);
-  //  }
-  //}
-  //free(conn->subscriptions);
+  int i;
+  for(i = 0; i<conn->numSubs; i++){
+    if (conn->subscriptions[i] != NULL){
+      free(conn->subscriptions[i]);
+    }
+  }
+  free(conn->subscriptions);
 
   char* path = malloc(strlen(conn->name) + 1 + PIPE_PREFIX_LEN);
   memcpy(path, PIPE_PREFIX, PIPE_PREFIX_LEN);
