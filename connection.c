@@ -182,13 +182,19 @@ THREAD_RET_TYPE dispatcher(void* args){
 
     Message* msg = malloc(sizeof(Message));
     #ifdef _WIN32
-      ReadFile(argz->hPipe, msg, sizeof(Message), NULL, NULL);
+      int code = ReadFile(argz->hPipe, msg, sizeof(Message), NULL, NULL);
     #else
-      read(fd, msg, sizeof(Message));
+      int code = read(fd, msg, sizeof(Message));
+    #endif
+
+    #ifndef _WIN32
+      if(code == -1){
+      	code = 0;
+      }
     #endif
 
     char* data;
-    if(msg->len < MAX_MSG_SIZE){
+    if(code && msg->len < MAX_MSG_SIZE){
       data = malloc(msg->len);
       #ifdef _WIN32
         ReadFile(argz->hPipe, data, msg->len, NULL, NULL);
@@ -197,7 +203,8 @@ THREAD_RET_TYPE dispatcher(void* args){
       #endif
       msg->data = data;
     }else{
-        data = malloc(1);
+        free(msg);
+        continue;
     }
 
     if(msg->type == CONN_TYPE_SUB){
