@@ -88,7 +88,7 @@ int nextEmpty(char** strs, int len){
 int findEqual(char** strs, char* other, int len){
   int i;
   for (i = 0; i < len; i++){
-    if(strs[i] && strcmp(strs[i], other) == 0){
+    if(strcmp(strs[i], other) == 0){
       return i;
     }
   }
@@ -137,8 +137,6 @@ THREAD_RET_TYPE writer(void* args){
   free(argz->msg->data);
   messageDestroy(argz->msg);
   free(argz);
-
-  return 0;
 }
 
 THREAD_RET_TYPE cbCaller(void* args){
@@ -152,8 +150,6 @@ THREAD_RET_TYPE cbCaller(void* args){
   free(argz->msg->data);
   free(argz->msg);
   free(argz);
-
-  return 0;
 }
 
 void dispatch(ConnectionCallback cb, Message* msg){
@@ -250,8 +246,6 @@ THREAD_RET_TYPE dispatcher(void* args){
   #else
     close(fd);
   #endif
-
-  return 0;
 }
 
 int findFreeCBSlot(){
@@ -306,8 +300,6 @@ Connection* connectionCreate(char* name, int type){
     ret->subscriptions[i] = NULL;
   }
 
-  ret->numSubs = SUBS_LEN;
-
   return ret;
 }
 
@@ -332,15 +324,6 @@ Connection* connectionConnect(char* name, int type){
 
   	free(path);
   #endif
-
-  ret->subscriptions = malloc(sizeof(char*) * SUBS_LEN);
-
-  int i;
-  for (i = 0; i < SUBS_LEN; i++){
-    ret->subscriptions[i] = NULL;
-  }
-
-  ret->numSubs = SUBS_LEN;
 
   return ret;
 }
@@ -424,11 +407,6 @@ void connectionSend(Connection* conn, Message* msg){
   args->msg->data = malloc(msg->len);
   memcpy(args->msg->data, msg->data, msg->len);
 
-  if (msg->type == CONN_TYPE_SUB){
-    args->msg->subject = malloc(strlen(msg->subject) + 1);
-    memcpy(args->msg->subject, msg->subject, strlen(msg->subject) + 1);
-  }
-
   args->path = path;
 
   #ifdef _WIN32
@@ -459,7 +437,7 @@ void connectionSubscribe(Connection* conn, char* subject){
 
 void connectionRemoveSubscription(Connection* conn, char* subject){
   int i = findEqual(conn->subscriptions, subject, conn->numSubs);
-  if (i >= 0){
+  if (i > 0){
     free(conn->subscriptions[i]);
     conn->subscriptions[i] = NULL;
   }

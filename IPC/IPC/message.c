@@ -8,8 +8,6 @@ Message* messageCreate(char* data, size_t len){
   ret->data = data;
   ret->len = len;
   ret->type = CONN_TYPE_ALL;
-
-  return ret;
 }
 
 void messageSetPID(Message* msg, PID pid){
