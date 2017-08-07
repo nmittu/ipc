@@ -78,7 +78,7 @@ void child(Connection* conn){
   for (i = 0; i < 50; i++) {
     usleep(100);
   }
-  //messageDestroy(msg);
+  messageDestroy(msg);
 
   //Wait for unsubscription
   for (i = 0; i < 500; i++) {
@@ -93,7 +93,7 @@ void child(Connection* conn){
   for (i = 0; i < 50; i++) {
     usleep(100);
   }
-  //messageDestroy(msg);
+  messageDestroy(msg);
 
 
   for (i = 0; i < 50; i++) {
