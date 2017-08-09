@@ -56,6 +56,10 @@ public class Connection{
     connectionRemoveSubscription(ptr, subject);
   }
 
+  public void close(){
+    connectionClose(ptr);
+  }
+
   public void destroy(){
     connectionDestroy(ptr);
   }
@@ -70,4 +74,5 @@ public class Connection{
   private native void connectionSubscribe(long ptr, String subject);
   private native void connectionRemoveSubscription(long ptr, String subject);
   private native void connectionDestroy(long ptr);
+  private native void connectionClose(long ptr);
 }

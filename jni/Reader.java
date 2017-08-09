@@ -27,6 +27,7 @@ public class Reader{
     }
 
     conn.stopAutoDispatch();
+    conn.close();
     conn.destroy();
   }
 }

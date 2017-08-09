@@ -35,24 +35,23 @@ void callback(Message* msg){
     (*jvm)->AttachCurrentThread(jvm, (void**) &env, NULL);
   }
 
-  size_t* name_len = msg->data + msg->len - sizeof(size_t);
-  char* name = msg->data + msg->len - sizeof(size_t) - *name_len;
+  //size_t* name_len = msg->data + msg->len;
+  char* name = msg->data + msg->len + sizeof(size_t);
   int i = findName(name);
   jobject cb = cbs[i];
 
   jclass clazz = (*env)->GetObjectClass(env, cb);
   jmethodID mid = (*env)->GetMethodID(env, clazz, "onMessage", "(Lcom/mittudev/ipc/Message;)V");
 
-  char* data = malloc(msg->len - *name_len - sizeof(size_t));
-  memcpy(data, msg->data, msg->len - *name_len - sizeof(size_t));
+  char* data = malloc(msg->len);
+  memcpy(data, msg->data, msg->len);
 
-  Message* copy = messageCreate(data, msg->len - *name_len - sizeof(size_t));
+  Message* copy = messageCreate(data, msg->len);
   if (msg->type == CONN_TYPE_SUB){
     messageSetSubject(copy, msg->subject);
   }else if (msg->type == CONN_TYPE_PID){
     messageSetPID(copy, msg->pid);
   }
-
 
   jclass msgClazz = (*env)->FindClass(env, "com/mittudev/ipc/Message");
   jmethodID constructor = (*env)->GetMethodID(env, msgClazz, "<init>", "(J)V");
@@ -131,13 +130,6 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionSend
   Connection* conn = (Connection*) ptr;
   Message* msg = (Message*) msgPtr;
 
-  size_t name_len = strlen(conn->name) + 1;
-  msg->data = realloc(msg->data, msg->len + name_len + sizeof(size_t));
-  memcpy(msg->data + msg->len, conn->name, name_len);
-  memcpy(msg->data + msg->len + name_len, &name_len, sizeof(size_t));
-
-  msg->len += name_len + sizeof(size_t);
-
   connectionSend(conn, msg);
 }
 
@@ -165,4 +157,10 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionDestroy
     (JNIEnv *env, jobject object, jlong ptr){
   Connection* conn = (Connection*) ptr;
   connectionDestroy(conn);
+}
+
+JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionClose
+    (JNIEnv *, jobject, jlong){
+  Connection* conn = (Connection*) ptr;
+  connectionClose(conn);
 }

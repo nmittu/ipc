@@ -87,6 +87,14 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionRemoveSubscrip
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionDestroy
   (JNIEnv *, jobject, jlong);
 
+/*
+ * Class:     com_mittudev_ipc_Connection
+ * Method:    connectionClose
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionClose
+  (JNIEnv *, jobject, jlong);
+
 #ifdef __cplusplus
 }
 #endif

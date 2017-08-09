@@ -36,6 +36,7 @@ void parent(Connection* conn, pid_t pid){
   printf("Next message wont be recieved in 5 seconds\n");
   sleep(5);
   connectionStopAutoDispatch(conn);
+  connectionClose(conn);
 }
 
 void child(Connection* conn){

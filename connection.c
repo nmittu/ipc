@@ -111,11 +111,14 @@ THREAD_RET_TYPE writer(void* args){
   #endif
 
 
-  size_t len = sizeof(Message) + argz->msg->len;
+  size_t* name_len = argz->msg->data + argz->msg->len;
+  size_t len = sizeof(Message) + argz->msg->len + sizeof(size_t) + *name_len;
   char* data = malloc(len);
 
   memcpy(data, argz->msg, sizeof(Message));
-  memcpy((data + sizeof(Message)), argz->msg->data, argz->msg->len);
+  memcpy((data + sizeof(Message)), argz->msg->data, len - sizeof(Message));
+
+
   if (argz->msg->type == CONN_TYPE_SUB){
     data = realloc(data, len + sizeof(size_t) + strlen(argz->msg->subject) + 1);
     size_t sub_len = strlen(argz->msg->subject) + 1;
@@ -195,12 +198,21 @@ THREAD_RET_TYPE dispatcher(void* args){
 
     char* data;
     if(code && msg->len < MAX_MSG_SIZE){
-      data = malloc(msg->len);
+      data = malloc(msg->len + sizeof(size_t));
       #ifdef _WIN32
-        ReadFile(argz->hPipe, data, msg->len, NULL, NULL);
+        ReadFile(argz->hPipe, data, msg->len + sizeof(size_t), NULL, NULL);
       #else
-        read(fd, data, msg->len);
+        read(fd, data, msg->len + sizeof(size_t));
       #endif
+
+      size_t* name_len = data + msg->len;
+      data = realloc(data, msg->len + sizeof(size_t) + *name_len);
+      #ifdef _WIN32
+        ReadFile(argz->hPipe, data + msg->len + sizeof(size_t), *name_len, NULL, NULL);
+      #else
+        read(fd, data + msg->len + sizeof(size_t), *name_len);
+      #endif
+
       msg->data = data;
     }else{
         free(msg);
@@ -428,8 +440,11 @@ void connectionSend(Connection* conn, Message* msg){
   args->msg = malloc(sizeof(Message));
   memcpy(args->msg, msg, sizeof(Message));
 
-  args->msg->data = malloc(msg->len);
+  size_t name_len = strlen(conn->name) + 1;
+  args->msg->data = malloc(msg->len + sizeof(size_t) + name_len);
   memcpy(args->msg->data, msg->data, msg->len);
+  memcpy(args->msg->data + msg->len, &name_len, sizeof(size_t));
+  memcpy(args->msg->data + msg->len + sizeof(size_t), conn->name, name_len);
 
   if (msg->type == CONN_TYPE_SUB){
     args->msg->subject = malloc(strlen(msg->subject) + 1);
@@ -472,6 +487,15 @@ void connectionRemoveSubscription(Connection* conn, char* subject){
   }
 }
 
+void connectionClose(Connection* conn){
+  #ifndef _WIN32
+    char* path = malloc(strlen(conn->name) + 1 + PIPE_PREFIX_LEN);
+    memcpy(path, PIPE_PREFIX, PIPE_PREFIX_LEN);
+    strcat(path, conn->name);
+  	unlink(path);
+  #endif
+}
+
 void connectionDestroy(Connection* conn){
   int i;
   for(i = 0; i<conn->numSubs; i++){
@@ -487,8 +511,6 @@ void connectionDestroy(Connection* conn){
   #ifdef _WIN32
 	DisconnectNamedPipe(conn->hPipe);
 	CloseHandle(conn->hPipe);
-  #else
-  	unlink(path);
   #endif
   free(path);
 

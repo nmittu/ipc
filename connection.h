@@ -36,5 +36,6 @@ void connectionSend(Connection* conn, Message* msg);
 void connectionSubscribe(Connection* conn, char* subject);
 void connectionRemoveSubscription(Connection* conn, char* subject);
 void connectionDestroy(Connection* conn);
+void connectionClose(Connection* conn);
 
 #endif
