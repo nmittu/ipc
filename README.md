@@ -53,7 +53,7 @@ From the src directory run ```make```
 Export your OS name to the JAVA_ARCH enviornment variable ex. linux32 linux64 darwin. There should be a folder with this name in $JAVA_HOME/include/$JAVA_ARCH
 
 From the jni directory run ```make```
-#### POSIX Examples
+#### Linux Examples
 From the examples/linux directory run ```make```
 #### Java Examples
 From the examples/java directory run ```make```
