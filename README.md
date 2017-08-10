@@ -45,3 +45,13 @@ int main (int argc char* argv[]){
 ```
 
 There is also a java binding for the IPC library. The Java API is similar to the C API.
+
+# Building
+#### IPC Library
+From the src directory run ```make```
+#### JNI Library
+From the jni directory run ```make```
+#### POSIX Examples
+From the tests/posix directory run ```make```
+#### Java Examples
+From the jni directory run ```make examples```
