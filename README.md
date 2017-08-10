@@ -50,8 +50,10 @@ There is also a java binding for the IPC library. The Java API is similar to the
 #### IPC Library
 From the src directory run ```make```
 #### JNI Library
+Export your OS name to the JAVA_ARCH enviornment variable ex. linux32 linux64 darwin. There should be a folder with this name in $JAVA_HOME/include/$JAVA_ARCH
+
 From the jni directory run ```make```
 #### POSIX Examples
-From the tests/posix directory run ```make```
+From the examples/linux directory run ```make```
 #### Java Examples
-From the jni directory run ```make examples```
+From the examples/java directory run ```make```
