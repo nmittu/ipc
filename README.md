@@ -47,6 +47,8 @@ int main (int argc char* argv[]){
 There is also a java binding for the IPC library. The Java API is similar to the C API.
 
 # Building
+#### Build All
+run ```./build.sh``` in the root directory.
 #### IPC Library
 From the src directory run ```make```
 #### JNI Library
