@@ -6,7 +6,7 @@ LIB_PATH=../bin
 INCLUDE=-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/$(JAVA_ARCH) -I../src
 PACKAGE=com/mittudev/ipc
 
-all: $(OUT_DIR)/libIPC.so $(OUT_DIR)/IPC.jar
+all: setup $(OUT_DIR)/libIPC.so $(OUT_DIR)/IPC.jar
 
 $(OUT_DIR)/libIPC.so: $(OBJ_DIR)/com_mittudev_ipc_Connection.o $(OBJ_DIR)/com_mittudev_ipc_Message.o
 	$(CC) $(OBJ_DIR)/com_mittudev_ipc_Connection.o $(OBJ_DIR)/com_mittudev_ipc_Message.o -L$(LIB_PATH) -lipc -shared -o $@
@@ -36,6 +36,11 @@ Writer.class:
 
 Reader.class:
 	javac Reader.java
+
+setup: $(OBJ_DIR)
+
+$(OBJ_DIR):
+	mkdir $(OBJ_DIR)
 
 clean:
 	rm *class
