@@ -160,7 +160,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionDestroy
 }
 
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionClose
-    (JNIEnv *, jobject, jlong){
+    (JNIEnv *env, jobject object, jlong ptr){
   Connection* conn = (Connection*) ptr;
   connectionClose(conn);
 }
