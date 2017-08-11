@@ -4,7 +4,7 @@ OBJ_DIR=../bin/cpp/objects
 LIB_PATH=../bin
 CC=g++
 C_CC=gcc
-CFLAGS=-c
+CFLAGS=-c -fPIC
 INCLUDE=-I../src -I../common
 
 all: setup $(OUT_DIR)/libIPC_CPP.so
