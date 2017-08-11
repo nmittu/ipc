@@ -3,10 +3,10 @@ extern "C"{
 }
 typedef Message IPC_Message;
 
-#include "Message.h"
+#include "IPC.h"
 
 
-IPC::Message::Message(char* data, size_t len){
+IPC::Message::Message(char* data, size_t len): destroy(1){
   ptr = messageCreate(data, len);
 }
 
@@ -31,5 +31,7 @@ void* IPC::Message::getCPointer(){
 }
 
 IPC::Message::~Message(){
-  messageDestroy((IPC_Message*) ptr);
+  if (destroy){
+    messageDestroy((IPC_Message*) ptr);
+  }
 }

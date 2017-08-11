@@ -1,3 +1,6 @@
+#ifndef MESSAGE_CPP_H
+#define MESSAGE_CPP_H
+
 #ifdef _WIN32
   #include <windows.h>
   #define PID DWORD
@@ -9,6 +12,7 @@
 namespace IPC{
   class Message{
   public:
+    Message(void* ptr_): ptr(ptr_), destroy(0){}
     Message(char* data, size_t len);
     ~Message();
 
@@ -20,5 +24,8 @@ namespace IPC{
 
   private:
     void* ptr;
+    int destroy;
   };
 }
+
+#endif
