@@ -7,9 +7,10 @@
 
 #define MAX_MSG_SIZE 1048576
 
-typedef void (*ConnectionCallback)(Message msg);
 
 namespace IPC{
+  typedef void (*ConnectionCallback)(IPC::Message msg);
+
   class Connection{
   public:
     Connection(void* ptr_): ptr(ptr_){}
@@ -23,7 +24,7 @@ namespace IPC{
     void removeCallback();
     void send(Message msg);
     void subscribe(char* subject);
-    void connectionRemoveSubscription(char* subject);
+    void removeSubscription(char* subject);
     void close();
 
   private:

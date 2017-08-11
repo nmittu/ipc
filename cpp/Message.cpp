@@ -3,7 +3,7 @@ extern "C"{
 }
 typedef Message IPC_Message;
 
-#include "IPC.h"
+#include "ipc_cpp.h"
 
 
 IPC::Message::Message(char* data, size_t len): destroy(1){
