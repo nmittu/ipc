@@ -14,7 +14,7 @@ int main (int argc char* argv[]){
     messageSetSubject(msg, "Example Subject");
     connectionSend(conn, msg);
     messagedestroy(msg);
-    connectionDestroy(conn); 
+    connectionDestroy(conn);
 }
 ```
 
@@ -33,29 +33,21 @@ int main (int argc char* argv[]){
     connectionSubscribe(conn, "Example Subject");
     connectionSetCallback(conn, callback);
     connectionStartAutoDispatch(conn);
-    
+
     while(!recieved){
         usleep(100);
     }
-    
+
     connectionStopAutoDispatch(conn);
     connectionClose(conn);
     connectionDestroy(conn);
 }
 ```
 
-There is also a java binding for the IPC library. The Java API is similar to the C API.
+There is also a java and c++ bindings for the IPC library. The other bindings are similar to the C API. Refer to the Java or C++ examples.
 
 # Building
-#### Build All
-run ```./build.sh``` in the root directory.
-#### IPC Library
-From the src directory run ```make```
-#### JNI Library
-Export your OS name to the JAVA_ARCH enviornment variable ex. linux32 linux64 darwin. There should be a folder with this name in $JAVA_HOME/include/$JAVA_ARCH
 
-From the jni directory run ```make```
-#### Linux Examples
-From the examples/linux directory run ```make```
-#### Java Examples
-From the examples/java directory run ```make```
+To build the whole project run "build.sh" from the root project directory.
+
+To build only certain parts of the api go to the directory of the portion of the api that you want to build and run "make".
