@@ -13,6 +13,7 @@ namespace IPC{
   class Message{
   public:
     Message(void* ptr_): ptr(ptr_), destroy(0){}
+    Message(const Message &obj): ptr(obj.ptr), destroy(0){}
     Message(char* data, size_t len);
     ~Message();
 

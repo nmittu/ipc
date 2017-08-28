@@ -13,7 +13,8 @@ namespace IPC{
 
   class Connection{
   public:
-    Connection(void* ptr_): ptr(ptr_){}
+    Connection(const Connection &obj): ptr(obj.ptr), destroy(0){}
+    Connection(void* ptr_): ptr(ptr_), destroy(0){}
     Connection(char* name, int type, int create=1);
     ~Connection();
 
@@ -29,6 +30,7 @@ namespace IPC{
 
   private:
     void* ptr;
+    int destroy;
   };
 }
 
