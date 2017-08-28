@@ -33,6 +33,10 @@ void cCallback(IPC_Message* msg){
 }
 
 IPC::Connection::Connection(char* name, int type, int create){
+  if(!initialized){
+    init();
+  }
+
   if (create){
     ptr = connectionCreate(name, type);
   }else{
@@ -79,5 +83,5 @@ void IPC::Connection::close(){
 }
 
 IPC::Connection::~Connection(){
-  connectionDestroy((IPC_Connection*) ptr);
+  //connectionDestroy((IPC_Connection*) ptr);
 }
