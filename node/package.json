@@ -4,7 +4,7 @@
   "description": "Interprocess Communication",
   "main": "index.js",
   "dependencies": {
-    "nan": "^2.6.2"
+    "nan": "~2.6.2"
   },
   "devDependencies": {},
   "scripts": {
