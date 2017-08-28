@@ -9,29 +9,29 @@
 
 
 namespace IPC{
-  typedef void (*ConnectionCallback)(IPC::Message msg);
+	typedef void (*ConnectionCallback)(IPC::Message msg);
 
-  class Connection{
-  public:
-    Connection(const Connection &obj): ptr(obj.ptr), destroy(0){}
-    Connection(void* ptr_): ptr(ptr_), destroy(0){}
-    Connection(char* name, int type, int create=1);
-    ~Connection();
+	class Connection{
+	public:
+		Connection(const Connection &obj): ptr(obj.ptr), destroy(0){}
+		Connection(void* ptr_): ptr(ptr_), destroy(0){}
+		Connection(char* name, int type, int create=1);
+		~Connection();
 
-    void startAutoDispatch();
-    void stopAutoDispatch();
-    void setCallback(ConnectionCallback cb);
-    ConnectionCallback getCallback();
-    void removeCallback();
-    void send(Message msg);
-    void subscribe(char* subject);
-    void removeSubscription(char* subject);
-    void close();
+		void startAutoDispatch();
+		void stopAutoDispatch();
+		void setCallback(ConnectionCallback cb);
+		ConnectionCallback getCallback();
+		void removeCallback();
+		void send(Message msg);
+		void subscribe(char* subject);
+		void removeSubscription(char* subject);
+		void close();
 
-  private:
-    void* ptr;
-    int destroy;
-  };
+	private:
+		void* ptr;
+		int destroy;
+	};
 }
 
 #endif

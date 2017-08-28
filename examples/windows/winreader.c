@@ -5,23 +5,23 @@
 
 void __usleep(__int64 usec)
 {
-    HANDLE timer;
-    LARGE_INTEGER ft;
+		HANDLE timer;
+		LARGE_INTEGER ft;
 
-    ft.QuadPart = -(10*usec); // Convert to 100 nanosecond interval, negative value indicates relative time
+		ft.QuadPart = -(10*usec); // Convert to 100 nanosecond interval, negative value indicates relative time
 
-    timer = CreateWaitableTimer(NULL, TRUE, NULL);
-    SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
-    WaitForSingleObject(timer, INFINITE);
-    CloseHandle(timer);
+		timer = CreateWaitableTimer(NULL, TRUE, NULL);
+		SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
+		WaitForSingleObject(timer, INFINITE);
+		CloseHandle(timer);
 }
 
 int recived = 0;
 
 void recive(Message* msg){
-  printf("Recived data: %s\n", msg->data);
+	printf("Recived data: %s\n", msg->data);
 
-  recived++;
+	recived++;
 }
 
 int main(int argc, char const *argv[]) {
@@ -34,6 +34,6 @@ int main(int argc, char const *argv[]) {
 	}
 
 	connectionStopAutoDispatch(conn);
-  connectionClose(conn);
+	connectionClose(conn);
 	connectionDestroy(conn);
 }

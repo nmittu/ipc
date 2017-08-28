@@ -3,23 +3,23 @@
 
 
 #ifdef _WIN32
-  #include <windows.h>
-  #define PID DWORD
+	#include <windows.h>
+	#define PID DWORD
 #else
-  #include <sys/types.h>
-  #define PID pid_t
+	#include <sys/types.h>
+	#define PID pid_t
 #endif
 
 
 typedef struct {
-  int type;
-  union {
-    PID pid;
-    char* subject;
-  };
+	int type;
+	union {
+		PID pid;
+		char* subject;
+	};
 
-  char* data;
-  size_t len;
+	char* data;
+	size_t len;
 } Message;
 
 #include "ipc.h"

@@ -2,7 +2,7 @@
 #define CONNECTION_H
 
 #ifdef _WIN32
-  #include <windows.h>
+	#include <windows.h>
 #endif
 
 #include "ipc.h"
@@ -14,13 +14,13 @@
 #define MAX_MSG_SIZE 1048576
 
 typedef struct {
-  char* name;
-  int type;
-  char** subscriptions;
-  int numSubs;
-  #ifdef _WIN32
+	char* name;
+	int type;
+	char** subscriptions;
+	int numSubs;
+	#ifdef _WIN32
 	HANDLE hPipe;
-  #endif
+	#endif
 } Connection;
 
 typedef void (*ConnectionCallback)(Message* msg);

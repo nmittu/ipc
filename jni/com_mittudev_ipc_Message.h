@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ([B)J
  */
 JNIEXPORT jlong JNICALL Java_com_mittudev_ipc_Message_messageCreate
-  (JNIEnv *, jobject, jbyteArray);
+	(JNIEnv *, jobject, jbyteArray);
 
 /*
  * Class:     com_mittudev_ipc_Message
@@ -21,7 +21,7 @@ JNIEXPORT jlong JNICALL Java_com_mittudev_ipc_Message_messageCreate
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Message_messageSetPID
-  (JNIEnv *, jobject, jlong, jint);
+	(JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     com_mittudev_ipc_Message
@@ -29,7 +29,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Message_messageSetPID
  * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Message_messageSetSubject
-  (JNIEnv *, jobject, jlong, jstring);
+	(JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     com_mittudev_ipc_Message
@@ -37,7 +37,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Message_messageSetSubject
  * Signature: (J)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_com_mittudev_ipc_Message_messageGetData
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_mittudev_ipc_Message
@@ -45,7 +45,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_mittudev_ipc_Message_messageGetData
  * Signature: (J)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_mittudev_ipc_Message_messageGetSubject
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_mittudev_ipc_Message
@@ -53,7 +53,7 @@ JNIEXPORT jstring JNICALL Java_com_mittudev_ipc_Message_messageGetSubject
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL Java_com_mittudev_ipc_Message_messageGetPID
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_mittudev_ipc_Message
@@ -61,7 +61,7 @@ JNIEXPORT jlong JNICALL Java_com_mittudev_ipc_Message_messageGetPID
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL Java_com_mittudev_ipc_Message_messageGetType
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_mittudev_ipc_Message
@@ -69,7 +69,7 @@ JNIEXPORT jint JNICALL Java_com_mittudev_ipc_Message_messageGetType
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Message_messageDestroy
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }

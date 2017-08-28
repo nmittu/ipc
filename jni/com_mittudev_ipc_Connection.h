@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;I)J
  */
 JNIEXPORT jlong JNICALL Java_com_mittudev_ipc_Connection_connectionCreate
-  (JNIEnv *, jclass, jstring, jint);
+	(JNIEnv *, jclass, jstring, jint);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -21,7 +21,7 @@ JNIEXPORT jlong JNICALL Java_com_mittudev_ipc_Connection_connectionCreate
  * Signature: (Ljava/lang/String;I)J
  */
 JNIEXPORT jlong JNICALL Java_com_mittudev_ipc_Connection_connectionConnect
-  (JNIEnv *, jclass, jstring, jint);
+	(JNIEnv *, jclass, jstring, jint);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -29,7 +29,7 @@ JNIEXPORT jlong JNICALL Java_com_mittudev_ipc_Connection_connectionConnect
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionStartAutoDispatch
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -37,7 +37,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionStartAutoDispa
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionStopAutoDispatch
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -45,7 +45,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionStopAutoDispat
  * Signature: (JLcom/mittudev/ipc/ConnectionCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionSetCallback
-  (JNIEnv *, jobject, jlong, jobject);
+	(JNIEnv *, jobject, jlong, jobject);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -53,7 +53,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionSetCallback
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionRemoveCallback
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -61,7 +61,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionRemoveCallback
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionSend
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -69,7 +69,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionSend
  * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionSubscribe
-  (JNIEnv *, jobject, jlong, jstring);
+	(JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -77,7 +77,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionSubscribe
  * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionRemoveSubscription
-  (JNIEnv *, jobject, jlong, jstring);
+	(JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -85,7 +85,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionRemoveSubscrip
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionDestroy
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_mittudev_ipc_Connection
@@ -93,7 +93,7 @@ JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionDestroy
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_mittudev_ipc_Connection_connectionClose
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }

@@ -7,31 +7,31 @@ typedef Message IPC_Message;
 
 
 IPC::Message::Message(char* data, size_t len): destroy(1){
-  ptr = messageCreate(data, len);
+	ptr = messageCreate(data, len);
 }
 
 void IPC::Message::setPID(PID pid){
-  messageSetPID((IPC_Message*) ptr, pid);
+	messageSetPID((IPC_Message*) ptr, pid);
 }
 
 void IPC::Message::setSubject(char* subject){
-  messageSetSubject((IPC_Message*) ptr, subject);
+	messageSetSubject((IPC_Message*) ptr, subject);
 }
 
 size_t IPC::Message::getLen(){
-  return ((IPC_Message*) ptr)->len;
+	return ((IPC_Message*) ptr)->len;
 }
 
 char* IPC::Message::getData(){
-  return ((IPC_Message*) ptr)->data;
+	return ((IPC_Message*) ptr)->data;
 }
 
 void* IPC::Message::getCPointer(){
-  return ptr;
+	return ptr;
 }
 
 IPC::Message::~Message(){
-  if (destroy){
-    messageDestroy((IPC_Message*) ptr);
-  }
+	if (destroy){
+		messageDestroy((IPC_Message*) ptr);
+	}
 }
