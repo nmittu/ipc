@@ -18,7 +18,7 @@ private:
   char* data;
 
   MessageWrap(char* data, size_t len);
-  MessageWrap(uint32_t ptr_hi, uint32_t ptr_lo): msg(new IPC::Message((void*) (((uint64_t)ptr_hi << 32) + ptr_lo))){ printf("%s\n", "new msg frm ptr"); };
+  MessageWrap(uint32_t ptr_hi, uint32_t ptr_lo): msg(new IPC::Message((void*) (((uint64_t)ptr_hi << 32) + ptr_lo))){}
   ~MessageWrap();
 
   static NAN_METHOD(New);
