@@ -44,7 +44,7 @@ int main (int argc char* argv[]){
 }
 ```
 
-There is also a java and c++ bindings for the IPC library. The other bindings are similar to the C API. Refer to the Java or C++ examples.
+There are also java, node.js and c++ bindings for the IPC library. The other bindings are similar to the C API. Refer to the Java, node.js or C++ examples.
 
 # Building
 
