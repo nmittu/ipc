@@ -9,6 +9,10 @@ make clean
 cd ../cpp
 make clean
 
+cd ../node
+rm -r build
+rm -r node_modules
+
 cd ../examples/linux
 make clean
 

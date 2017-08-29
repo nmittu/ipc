@@ -9,6 +9,9 @@ make
 cd ../cpp
 make
 
+cd ../node
+npm install
+
 cd ../examples/linux
 make
 
