@@ -38,7 +38,24 @@ void cppCallback(IPC::Message msg){
 
 NAN_MODULE_INIT(ConnectionWrap::Init){
 	init();
-  //TODO
+
+	v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+  tpl->SetClassName(Nan::New("Connection").ToLocalChecked());
+  tpl->InstanceTemplate()->SetInternalFieldCount(9);
+
+	Nan::SetPrototypeMethod(tpl, "startAutoDispatch", startAutoDispatch);
+	Nan::SetPrototypeMethod(tpl, "stopAutoDispatch", stopAutoDispatch);
+	Nan::SetPrototypeMethod(tpl, "setCallback", setCallback);
+	Nan::SetPrototypeMethod(tpl, "getCallback", getCallback);
+	Nan::SetPrototypeMethod(tpl, "removeCallback", removeCallback);
+	Nan::SetPrototypeMethod(tpl, "send", send);
+	Nan::SetPrototypeMethod(tpl, "subscribe", subscribe);
+	Nan::SetPrototypeMethod(tpl, "removeSubscription", removeSubscription);
+	Nan::SetPrototypeMethod(tpl, "close", close);
+
+	constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  Nan::Set(target, Nan::New("Connection").ToLocalChecked(),
+    Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 ConnectionWrap::ConnectionWrap(char* name, int type, int create){

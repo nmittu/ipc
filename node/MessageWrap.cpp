@@ -7,7 +7,7 @@ using namespace node;
 
 NAN_MODULE_INIT(MessageWrap::Init){
   v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
-  tpl->SetClassName(Nan::New("MyObject").ToLocalChecked());
+  tpl->SetClassName(Nan::New("Message").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(3);
 
   Nan::SetPrototypeMethod(tpl, "setPID", setPID);
