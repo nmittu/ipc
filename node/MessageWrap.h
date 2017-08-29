@@ -9,7 +9,10 @@ class MessageWrap: public Nan::ObjectWrap {
 public:
   IPC::Message* msg;
   static NAN_MODULE_INIT(Init);
-  static inline Nan::Persistent<v8::Function> & constructor();
+  static inline Nan::Persistent<v8::Function> & constructor(){
+    static Nan::Persistent<v8::Function> my_constructor;
+    return my_constructor;
+  }
 
 private:
   char* data;

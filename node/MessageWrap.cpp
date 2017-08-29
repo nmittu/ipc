@@ -70,8 +70,3 @@ NAN_METHOD(MessageWrap::getData){
 
   info.GetReturnValue().Set(Nan::NewBuffer(datacpy, len).ToLocalChecked());
 }
-
-inline Nan::Persistent<v8::Function> & MessageWrap::constructor() {
-  static Nan::Persistent<v8::Function> my_constructor;
-  return my_constructor;
-}
