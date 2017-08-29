@@ -44,6 +44,10 @@ IPC::Connection::Connection(char* name, int type, int create): destroy(1){
 	}
 }
 
+char* IPC::Connection::getName(){
+  return ((IPC_Connection*) ptr)->name;
+}
+
 void IPC::Connection::startAutoDispatch(){
 	connectionStartAutoDispatch((IPC_Connection*) ptr);
 }

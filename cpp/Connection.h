@@ -18,6 +18,7 @@ namespace IPC{
 		Connection(char* name, int type, int create=1);
 		~Connection();
 
+		char* getName();
 		void startAutoDispatch();
 		void stopAutoDispatch();
 		void setCallback(ConnectionCallback cb);

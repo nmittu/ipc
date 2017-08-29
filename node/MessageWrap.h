@@ -7,13 +7,15 @@
 
 class MessageWrap: public Nan::ObjectWrap {
 public:
+  IPC::Message* msg;
   static NAN_MODULE_INIT(Init);
+  static inline Nan::Persistent<v8::Function> & constructor();
 
 private:
   char* data;
-  IPC::Message* msg;
 
   MessageWrap(char* data, size_t len);
+  MessageWrap(uint32_t ptr_hi, uint32_t ptr_lo): msg(new IPC::Message((void*) (((uint64_t)ptr_hi << 32) + ptr_lo))){};
   ~MessageWrap();
 
   static NAN_METHOD(New);
@@ -23,8 +25,6 @@ private:
   static NAN_METHOD(setSubject);
 
   static NAN_METHOD(getData);
-
-  static inline Nan::Persistent<v8::Function> & constructor();
 };
 
 #endif

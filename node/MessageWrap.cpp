@@ -25,18 +25,26 @@ MessageWrap::MessageWrap(char* data, size_t len): data(data){
 
 MessageWrap::~MessageWrap(){
   delete msg;
-  free(data);
+  if (data != NULL){
+    free(data);
+  }
 }
 
 NAN_METHOD(MessageWrap::New){
-  Local<Object> bufferObj = info[0]->ToObject();
-  char* data_tmp = Buffer::Data(bufferObj);
-  size_t len = Buffer::Length(bufferObj);
+  MessageWrap* obj;
+  if(info[0]->IsNumber()){
+    obj = new MessageWrap(info[0]->Uint32Value(), info[1]->Uint32Value());
+  }else{
+    Local<Object> bufferObj = info[0]->ToObject();
+    char* data_tmp = Buffer::Data(bufferObj);
+    size_t len = Buffer::Length(bufferObj);
 
-  char* datacpy = (char*) malloc(len);
-  memcpy(datacpy, data_tmp, len);
+    char* datacpy = (char*) malloc(len);
+    memcpy(datacpy, data_tmp, len);
 
-  MessageWrap* obj = new MessageWrap(datacpy, len);
+    obj = new MessageWrap(datacpy, len);
+  }
+
   obj->Wrap(info.This());
   info.GetReturnValue().Set(info.This());
 }

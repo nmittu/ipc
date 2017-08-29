@@ -2,12 +2,13 @@
   'targets': [
     {
       'target_name': 'IPC',
-      'sources': [ 'addon.cpp', 'MessageWrap.cpp' ],
+      'sources': [ 'addon.cpp', 'ConnectionWrap.cpp', 'MessageWrap.cpp', '../common/hashtable.c' ],
 
       'include_dirs': [
         "<!(node -e \"require('nan')\")",
         "../cpp",
-        "../src"
+        "../src",
+        "../common"
       ],
 
       'xcode_settings': {
