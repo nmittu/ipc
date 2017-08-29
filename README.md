@@ -44,10 +44,12 @@ int main (int argc char* argv[]){
 }
 ```
 
-There is also a java and c++ bindings for the IPC library. The other bindings are similar to the C API. Refer to the Java or C++ examples.
+There are also java, node.js and c++ bindings for the IPC library. The other bindings are similar to the C API. Refer to the Java, node.js or C++ examples.
 
 # Building
 
 To build the whole project run "build.sh" from the root project directory.
 
 To build only certain parts of the api go to the directory of the portion of the api that you want to build and run "make".
+
+Refer to the README file in the node directory for instructions on building the node binding.
