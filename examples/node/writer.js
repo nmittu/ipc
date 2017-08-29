@@ -1,4 +1,4 @@
-var IPC = require('./build/Release/IPC');
+var IPC = require('../../node/build/Release/IPC');
 
 var conn = new IPC.Connection("ipcnodedemo", 1);
 
