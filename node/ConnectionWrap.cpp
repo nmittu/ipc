@@ -12,14 +12,69 @@ using namespace node;
 #define HT_CAPACITY 50
 
 hashtable_t* ht;
+uv_async_t async;
+uv_loop_t* loop;
 
-void init(){
-	ht = ht_create(HT_CAPACITY);
+void cbInMainThread(uv_async_t* handle){
+	printf("%s\n", "Main thrd");
+	Nan::HandleScope scope;
+
+	printf("%s\n", "got scope");
+
+	IPC::Message* msg = (IPC::Message*) handle->data;
+
+	char* name = msg->getData() + msg->getLen() + sizeof(size_t);
+
+	Nan::Callback* cb = (Nan::Callback*) ht_get(ht, name);
+	printf("%s\n", "found cb");
+
+	Local<Function> cons = Nan::New(MessageWrap::constructor());
+	printf("%s\n", "found constructor");
+
+	uint64_t ptr = (uint64_t) msg->getCPointer();
+	uint32_t ptr_hi = ptr >> 32;
+	uint32_t ptr_lo = ptr & 0xffffffff;
+
+	Local<Value> cons_argv[2] = {Nan::New<Uint32>(ptr_hi), Nan::New<Uint32>(ptr_lo)};
+	Local<Value> argv[1] = {Nan::NewInstance(cons, 2, cons_argv).ToLocalChecked()};
+
+	printf("%s\n", "new inst");
+
+	cb->Call(1, argv);
+
+	//printf("%s\n", "called");
+	//fflush(stdout);
+
+	delete msg;
 }
 
 
 void cppCallback(IPC::Message msg){
-  char* name = msg.getData() + msg.getLen() + sizeof(size_t);
+
+	size_t len = msg.getLen();
+
+	if (msg.getType() == 3){
+		len += strlen(msg.getSubject()) + 1;
+	}
+
+	char* data = (char*) malloc(len);
+
+	memcpy(data, msg.getData(), msg.getLen());
+
+	IPC::Message* copy = new IPC::Message(data);
+
+	if (msg.getType() == 2){
+		copy->setPID(msg.getPID());
+	}else if (msg.getType() == 3){
+		memcpy(data + msg.getLen(), msg.getSubject(), strlen(msg.getSubject()) + 1);
+		copy->setSubject(data + msg.getLen());
+	}
+
+	async.data = copy;
+
+	uv_async_send(&async);
+
+  /*char* name = msg.getData() + msg.getLen() + sizeof(size_t);
 
 	Nan::Callback* cb = (Nan::Callback*) ht_get(ht, name);
 
@@ -32,7 +87,13 @@ void cppCallback(IPC::Message msg){
 	Local<Value> cons_argv[2] = {Nan::New<Uint32>(ptr_hi), Nan::New<Uint32>(ptr_lo)};
 	Local<Value> argv[1] = {Nan::NewInstance(cons, 2, cons_argv).ToLocalChecked()};
 
-	cb->Call(1, argv);
+	cb->Call(1, argv);*/
+}
+
+void init(){
+	ht = ht_create(HT_CAPACITY);
+	loop = uv_default_loop();
+	uv_async_init(loop, &async, cbInMainThread);
 }
 
 

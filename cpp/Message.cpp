@@ -14,8 +14,16 @@ void IPC::Message::setPID(PID pid){
 	messageSetPID((IPC_Message*) ptr, pid);
 }
 
+PID IPC::Message::getPID(){
+	return ((IPC_Message*) ptr)->pid;
+}
+
 void IPC::Message::setSubject(char* subject){
 	messageSetSubject((IPC_Message*) ptr, subject);
+}
+
+char* IPC::Message::getSubject(){
+	return ((IPC_Message*) ptr)->subject;
 }
 
 size_t IPC::Message::getLen(){
@@ -28,6 +36,10 @@ char* IPC::Message::getData(){
 
 void* IPC::Message::getCPointer(){
 	return ptr;
+}
+
+int IPC::Message::getType(){
+  return ((IPC_Message*) ptr)->type;
 }
 
 IPC::Message::~Message(){

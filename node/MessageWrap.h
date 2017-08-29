@@ -10,15 +10,15 @@ public:
   IPC::Message* msg;
   static NAN_MODULE_INIT(Init);
   static inline Nan::Persistent<v8::Function> & constructor(){
-    static Nan::Persistent<v8::Function> my_constructor;
-    return my_constructor;
+    static Nan::Persistent<v8::Function> msg_constructor;
+    return msg_constructor;
   }
 
 private:
   char* data;
 
   MessageWrap(char* data, size_t len);
-  MessageWrap(uint32_t ptr_hi, uint32_t ptr_lo): msg(new IPC::Message((void*) (((uint64_t)ptr_hi << 32) + ptr_lo))){};
+  MessageWrap(uint32_t ptr_hi, uint32_t ptr_lo): msg(new IPC::Message((void*) (((uint64_t)ptr_hi << 32) + ptr_lo))){ printf("%s\n", "new msg frm ptr"); };
   ~MessageWrap();
 
   static NAN_METHOD(New);

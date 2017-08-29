@@ -18,10 +18,13 @@ namespace IPC{
 		~Message();
 
 		void setPID(PID pid);
+		PID getPID();
 		void setSubject(char* subject);
+		char* getSubject();
 		size_t getLen();
 		char* getData();
 		void* getCPointer();
+		int getType();
 
 	private:
 		void* ptr;
