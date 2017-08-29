@@ -11,47 +11,51 @@ using namespace node;
 
 #define HT_CAPACITY 50
 
+IPC::Message* queue[50];
+int queue_len = 0;
+uv_mutex_t mutex;
+
 hashtable_t* ht;
 uv_async_t async;
 uv_loop_t* loop;
 
 void cbInMainThread(uv_async_t* handle){
-	printf("%s\n", "Main thrd");
 	Nan::HandleScope scope;
 
-	printf("%s\n", "got scope");
+	uv_mutex_lock(&mutex);
 
-	IPC::Message* msg = (IPC::Message*) handle->data;
+	for (int i = 0; i < queue_len; i++){
+		IPC::Message* msg = queue[i];
 
-	char* name = msg->getData() + msg->getLen() + sizeof(size_t);
+		char* name = msg->getData() + msg->getLen();
 
-	Nan::Callback* cb = (Nan::Callback*) ht_get(ht, name);
-	printf("%s\n", "found cb");
+		Nan::Callback* cb = (Nan::Callback*) ht_get(ht, name);
 
-	Local<Function> cons = Nan::New(MessageWrap::constructor());
-	printf("%s\n", "found constructor");
+		Local<Function> cons = Nan::New(MessageWrap::constructor());
 
-	uint64_t ptr = (uint64_t) msg->getCPointer();
-	uint32_t ptr_hi = ptr >> 32;
-	uint32_t ptr_lo = ptr & 0xffffffff;
+		uint64_t ptr = (uint64_t) msg->getCPointer();
+		uint32_t ptr_hi = ptr >> 32;
+		uint32_t ptr_lo = ptr & 0xffffffff;
 
-	Local<Value> cons_argv[2] = {Nan::New<Uint32>(ptr_hi), Nan::New<Uint32>(ptr_lo)};
-	Local<Value> argv[1] = {Nan::NewInstance(cons, 2, cons_argv).ToLocalChecked()};
+		Local<Value> cons_argv[2] = {Nan::New<Uint32>(ptr_hi), Nan::New<Uint32>(ptr_lo)};
+		Local<Value> argv[1] = {Nan::NewInstance(cons, 2, cons_argv).ToLocalChecked()};
 
-	printf("%s\n", "new inst");
+		cb->Call(1, argv);
 
-	cb->Call(1, argv);
+		delete msg;
+	}
 
-	//printf("%s\n", "called");
-	//fflush(stdout);
-
-	delete msg;
+	queue_len = 0;
+	uv_mutex_unlock(&mutex);
 }
 
 
 void cppCallback(IPC::Message msg){
 
-	size_t len = msg.getLen();
+	char* name = msg.getData() + msg.getLen() + sizeof(size_t);
+	size_t name_len = strlen(name) + 1;
+
+	size_t len = msg.getLen() + name_len;
 
 	if (msg.getType() == 3){
 		len += strlen(msg.getSubject()) + 1;
@@ -60,40 +64,28 @@ void cppCallback(IPC::Message msg){
 	char* data = (char*) malloc(len);
 
 	memcpy(data, msg.getData(), msg.getLen());
+	memcpy(data + msg.getLen(), name, name_len);
 
-	IPC::Message* copy = new IPC::Message(data);
+	IPC::Message* copy = new IPC::Message(data, msg.getLen());
 
 	if (msg.getType() == 2){
 		copy->setPID(msg.getPID());
 	}else if (msg.getType() == 3){
-		memcpy(data + msg.getLen(), msg.getSubject(), strlen(msg.getSubject()) + 1);
+		memcpy(data + msg.getLen() + name_len, msg.getSubject(), strlen(msg.getSubject()) + 1);
 		copy->setSubject(data + msg.getLen());
 	}
 
-	async.data = copy;
+	uv_mutex_lock(&mutex);
+	queue[queue_len++] = copy;
+	uv_mutex_unlock(&mutex);
+
 
 	uv_async_send(&async);
 
-  /*char* name = msg.getData() + msg.getLen() + sizeof(size_t);
-
-	Nan::Callback* cb = (Nan::Callback*) ht_get(ht, name);
-
-	Local<Function> cons = Nan::New(MessageWrap::constructor());
-
-	uint64_t ptr = (uint64_t) msg.getCPointer();
-	uint32_t ptr_hi = ptr >> 32;
-	uint32_t ptr_lo = ptr & 0xffffffff;
-
-	Local<Value> cons_argv[2] = {Nan::New<Uint32>(ptr_hi), Nan::New<Uint32>(ptr_lo)};
-	Local<Value> argv[1] = {Nan::NewInstance(cons, 2, cons_argv).ToLocalChecked()};
-
-	cb->Call(1, argv);*/
 }
 
 void init(){
 	ht = ht_create(HT_CAPACITY);
-	loop = uv_default_loop();
-	uv_async_init(loop, &async, cbInMainThread);
 }
 
 
@@ -141,6 +133,10 @@ NAN_METHOD(ConnectionWrap::New){
 }
 
 NAN_METHOD(ConnectionWrap::startAutoDispatch){
+	loop = uv_default_loop();
+	uv_async_init(loop, &async, cbInMainThread);
+	uv_mutex_init(&mutex);
+
   IPC::Connection* conn = Nan::ObjectWrap::Unwrap<ConnectionWrap>(info.Holder())->conn;
   conn->startAutoDispatch();
 }
@@ -148,6 +144,8 @@ NAN_METHOD(ConnectionWrap::startAutoDispatch){
 NAN_METHOD(ConnectionWrap::stopAutoDispatch){
   IPC::Connection* conn = Nan::ObjectWrap::Unwrap<ConnectionWrap>(info.Holder())->conn;
   conn->stopAutoDispatch();
+	uv_close((uv_handle_t*) &async, NULL);
+	uv_mutex_destroy(&mutex);
 }
 
 NAN_METHOD(ConnectionWrap::setCallback){

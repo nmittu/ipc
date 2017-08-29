@@ -15,7 +15,6 @@ function waituntil(num, final){
 function cleanup(){
   conn.stopAutoDispatch();
   conn.close();
-  conn.destroy();
 }
 
 
