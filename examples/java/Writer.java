@@ -5,7 +5,7 @@ import java.lang.Thread;
 
 public class Writer {
 	public static void main(String[] args) {
-		Connection conn = Connection.connect("ipcjavademo", 1);
+		Connection conn = Connection.connect("ipcdemo", 1);
 
 		System.out.println("Sent: message1");
 		Message msg = new Message("Message 1".getBytes());

@@ -1,6 +1,6 @@
 var IPC = require('../../node/build/Release/IPC');
 
-var conn = new IPC.Connection("ipcnodedemo", 1);
+var conn = new IPC.Connection("ipcdemo", 1);
 
 console.log("Sent: message1");
 var msg = new IPC.Message(Buffer.from("Message 1"));

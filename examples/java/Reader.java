@@ -14,7 +14,7 @@ class Callback implements ConnectionCallback{
 public class Reader{
 	public static void main(String[] args) {
 		Callback cb = new Callback();
-		Connection conn = new Connection("ipcjavademo", 1);
+		Connection conn = new Connection("ipcdemo", 1);
 		conn.setCallback(cb);
 		conn.startAutoDispatch();
 

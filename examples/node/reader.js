@@ -2,7 +2,7 @@ var IPC = require('../../node/build/Release/IPC');
 
 var recived = 0;
 
-var conn = new IPC.Connection("ipcnodedemo", 1);
+var conn = new IPC.Connection("ipcdemo", 1);
 
 function waituntil(num, final){
   if (recived < num){
