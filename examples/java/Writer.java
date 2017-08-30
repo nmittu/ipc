@@ -10,31 +10,16 @@ public class Writer {
 		System.out.println("Sent: message1");
 		Message msg = new Message("Message 1".getBytes());
 		conn.send(msg);
-		try{
-			Thread.sleep(500);
-		}catch (Exception e){
-			e.printStackTrace();
-		}
 		msg.destroy();
 
 		System.out.println("Sent: message2");
 		msg = new Message("Message 2".getBytes());
 		conn.send(msg);
-		try{
-			Thread.sleep(500);
-		}catch (Exception e){
-			e.printStackTrace();
-		}
 		msg.destroy();
 
 		System.out.println("Sent: message3");
 		msg = new Message("Message 3".getBytes());
 		conn.send(msg);
-		try{
-			Thread.sleep(500);
-		}catch (Exception e){
-			e.printStackTrace();
-		}
 		msg.destroy();
 
 		conn.destroy();

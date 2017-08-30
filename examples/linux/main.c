@@ -75,10 +75,6 @@ void child(Connection* conn){
 	msg = messageCreate(str, strlen(str)+1);
 	messageSetSubject(msg, "DEMO-SUBJECT");
 	connectionSend(conn, msg);
-	//Wait for message to send
-	for (i = 0; i < 50; i++) {
-		usleep(100);
-	}
 	messageDestroy(msg);
 
 	//Wait for unsubscription
@@ -90,16 +86,7 @@ void child(Connection* conn){
 	msg = messageCreate(str, strlen(str)+1);
 	messageSetSubject(msg, "DEMO-SUBJECT");
 	connectionSend(conn, msg);
-	//Wait for message to send
-	for (i = 0; i < 50; i++) {
-		usleep(100);
-	}
 	messageDestroy(msg);
-
-
-	for (i = 0; i < 50; i++) {
-		usleep(100);
-	}
 }
 
 int main(int argc, char const *argv[]) {
